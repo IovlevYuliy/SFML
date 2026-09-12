@@ -167,6 +167,38 @@ void SoundSource::setAttenuation(float attenuation)
 
 
 ////////////////////////////////////////////////////////////
+void SoundSource::setAttenuationModel(AttenuationModel model)
+{
+    if (auto* sound = static_cast<ma_sound*>(getSound()))
+    {
+        ma_attenuation_model attenuationModel = ma_attenuation_model_inverse;
+
+        switch (model)
+        {
+            case AttenuationModel::None:
+                attenuationModel = ma_attenuation_model_none;
+                break;
+
+            case AttenuationModel::Inverse:
+                attenuationModel = ma_attenuation_model_inverse;
+                break;
+
+            case AttenuationModel::Linear:
+                attenuationModel = ma_attenuation_model_linear;
+                break;
+
+            case AttenuationModel::Exponential:
+                attenuationModel = ma_attenuation_model_exponential;
+                break;
+        }
+
+        ma_sound_set_attenuation_model(sound, attenuationModel);
+    }
+
+}
+
+
+////////////////////////////////////////////////////////////
 // NOLINTNEXTLINE(performance-unnecessary-value-param)
 void SoundSource::setEffectProcessor(EffectProcessor)
 {
@@ -351,6 +383,34 @@ float SoundSource::getAttenuation() const
 
 
 ////////////////////////////////////////////////////////////
+SoundSource::AttenuationModel SoundSource::getAttenuationModel() const
+{
+    if (const auto* sound = static_cast<const ma_sound*>(getSound()))
+    {
+        switch (ma_sound_get_attenuation_model(sound))
+        {
+            case ma_attenuation_model_none:
+                return AttenuationModel::None;
+
+            case ma_attenuation_model_inverse:
+                return AttenuationModel::Inverse;
+
+            case ma_attenuation_model_linear:
+                return AttenuationModel::Linear;
+
+            case ma_attenuation_model_exponential:
+                return AttenuationModel::Exponential;
+
+            default:
+                break;
+        }
+    }
+
+    return AttenuationModel::Inverse;
+}
+
+
+////////////////////////////////////////////////////////////
 SoundSource& SoundSource::operator=(const SoundSource& right)
 {
     // Assign the sound attributes
@@ -369,6 +429,7 @@ SoundSource& SoundSource::operator=(const SoundSource& right)
     setMinGain(right.getMinGain());
     setMaxGain(right.getMaxGain());
     setAttenuation(right.getAttenuation());
+    setAttenuationModel(right.getAttenuationModel());
 
     return *this;
 }

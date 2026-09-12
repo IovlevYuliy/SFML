@@ -202,6 +202,7 @@ Sound::Sound(const Sound& copy) : SoundSource(copy), m_impl(std::make_unique<Imp
     if (copy.m_impl->buffer)
         setBuffer(*copy.m_impl->buffer);
     setLooping(copy.isLooping());
+    setAttenuationModel(copy.getAttenuationModel());
 }
 
 

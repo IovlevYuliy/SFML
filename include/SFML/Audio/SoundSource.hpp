@@ -76,6 +76,14 @@ public:
         float outerGain{}; //!< Outer gain
     };
 
+    enum class AttenuationModel
+    {
+        None,
+        Inverse,
+        Linear,
+        Exponential
+    };
+
     ////////////////////////////////////////////////////////////
     /// \brief Callable that is provided with sound data for processing
     ///
@@ -420,6 +428,26 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     void setAttenuation(float attenuation);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Set the attenuation model of the sound
+    ///
+    /// The default attenuation model is `Inverse`.
+    ///
+    /// \param model New attenuation model of the sound
+    ///
+    /// \see `getAttenuationModel`
+    ////////////////////////////////////////////////////////////
+    void setAttenuationModel(AttenuationModel model);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Get the attenuation model of the sound
+    ///
+    /// \return Current attenuation model
+    ///
+    /// \see `setAttenuationModel`
+    ////////////////////////////////////////////////////////////
+    [[nodiscard]] AttenuationModel getAttenuationModel() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the effect processor to be applied to the sound
