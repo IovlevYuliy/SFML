@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -108,7 +108,7 @@ EaglContext::EaglContext(EaglContext* shared) : m_context(nil)
 
 ////////////////////////////////////////////////////////////
 EaglContext::EaglContext(EaglContext* shared, const ContextSettings& settings, const WindowImpl& owner, unsigned int bitsPerPixel) :
-m_context(nil)
+    m_context(nil)
 {
     ensureInit();
 
@@ -120,7 +120,7 @@ m_context(nil)
 
 ////////////////////////////////////////////////////////////
 EaglContext::EaglContext(EaglContext* /* shared */, const ContextSettings& /* settings */, Vector2u /* size */) :
-m_context(nil)
+    m_context(nil)
 {
     ensureInit();
 

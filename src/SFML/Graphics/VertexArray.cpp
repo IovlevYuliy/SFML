@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -129,6 +129,34 @@ FloatRect VertexArray::getBounds() const
 
     // Array is empty
     return {};
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<Vertex>::iterator VertexArray::begin()
+{
+    return m_vertices.begin();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<Vertex>::const_iterator VertexArray::begin() const
+{
+    return m_vertices.begin();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<Vertex>::iterator VertexArray::end()
+{
+    return m_vertices.end();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<Vertex>::const_iterator VertexArray::end() const
+{
+    return m_vertices.end();
 }
 
 

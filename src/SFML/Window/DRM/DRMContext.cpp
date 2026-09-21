@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2024-2025 Andrew Mickelson
+// Copyright (C) 2024-2026 Andrew Mickelson
 //               2013 Jonathan De Wachter (dewachter.jonathan@gmail.com)
 //
 // This software is provided 'as-is', without any express or implied warranty.
@@ -34,6 +34,7 @@
 
 #include <array>
 #include <fcntl.h>
+#include <ostream>
 #include <poll.h>
 #include <unistd.h>
 #include <xf86drm.h>

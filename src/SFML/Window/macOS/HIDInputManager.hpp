@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Marco Antognini (antognini.marco@gmail.com),
+// Copyright (C) 2007-2026 Marco Antognini (antognini.marco@gmail.com),
 //                         Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
@@ -43,24 +43,12 @@ namespace sf::priv
 using IOHIDElements = std::vector<IOHIDElementRef>;
 
 ////////////////////////////////////////////////////////////
-/// \brief sf::priv::InputImpl helper
-///
-/// This class manage as a singleton instance the keyboard state.
-/// Its purpose is to help sf::priv::InputImpl class.
-///
-////////////////////////////////////////////////////////////
 class HIDInputManager
 {
 public:
     ////////////////////////////////////////////////////////////
-    /// \brief Deleted copy constructor
-    ///
-    ////////////////////////////////////////////////////////////
     HIDInputManager(const HIDInputManager&) = delete;
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Deleted copy assignment
-    ///
     ////////////////////////////////////////////////////////////
     HIDInputManager& operator=(const HIDInputManager&) = delete;
 
@@ -128,45 +116,24 @@ public:
     static Keyboard::Scancode nonLocalizedKey(char16_t virtualKeycode);
 
     ////////////////////////////////////////////////////////////
-    /// \copydoc sf::Keyboard::isKeyPressed(Key)
-    ///
-    ////////////////////////////////////////////////////////////
     bool isKeyPressed(Keyboard::Key key);
 
-    ////////////////////////////////////////////////////////////
-    /// \copydoc sf::Keyboard::isKeyPressed(Scancode)
-    ///
     ////////////////////////////////////////////////////////////
     bool isKeyPressed(Keyboard::Scancode code);
 
     ////////////////////////////////////////////////////////////
-    /// \copydoc sf::Keyboard::localize
-    ///
-    ////////////////////////////////////////////////////////////
     Keyboard::Key localize(Keyboard::Scancode code);
 
     ////////////////////////////////////////////////////////////
-    /// \copydoc sf::Keyboard::delocalize
-    ///
-    ////////////////////////////////////////////////////////////
     Keyboard::Scancode delocalize(Keyboard::Key key);
 
-    ////////////////////////////////////////////////////////////
-    /// \copydoc sf::Keyboard::getDescription
-    ///
     ////////////////////////////////////////////////////////////
     String getDescription(Keyboard::Scancode code);
 
 private:
     ////////////////////////////////////////////////////////////
-    /// \brief Default constructor
-    ///
-    ////////////////////////////////////////////////////////////
     HIDInputManager();
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Destructor
-    ///
     ////////////////////////////////////////////////////////////
     ~HIDInputManager();
 
@@ -243,7 +210,7 @@ private:
     ///
     /// \param page  HID page like kHIDPage_GenericDesktop
     /// \param usage HID usage page like kHIDUsage_GD_Keyboard or kHIDUsage_GD_Mouse
-    /// \return a retained, non-empty CFSetRef of IOHIDDeviceRef or a null pointer
+    /// \return a retained, non-empty CFSetRef of IOHIDDeviceRef or `nullptr`
     ///
     ////////////////////////////////////////////////////////////
     CFSetRef copyDevices(std::uint32_t page, std::uint32_t usage);

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -59,10 +59,10 @@ void encode(std::ostream& stream, std::uint16_t value)
 void encode(std::ostream& stream, std::uint32_t value)
 {
     const std::array bytes = {
-        static_cast<char>(value & 0x000000FF),
-        static_cast<char>((value & 0x0000FF00) >> 8),
-        static_cast<char>((value & 0x00FF0000) >> 16),
-        static_cast<char>((value & 0xFF000000) >> 24),
+        static_cast<char>((value & 0x00'00'00'FF) >> 0),
+        static_cast<char>((value & 0x00'00'FF'00) >> 8),
+        static_cast<char>((value & 0x00'FF'00'00) >> 16),
+        static_cast<char>((value & 0xFF'00'00'00) >> 24),
     };
     stream.write(bytes.data(), bytes.size());
 }

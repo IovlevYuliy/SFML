@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -75,9 +75,44 @@ bool setDevice(const std::string& name)
 
 
 ////////////////////////////////////////////////////////////
+bool setDeviceToDefault()
+{
+    return priv::AudioDevice::setDeviceToDefault();
+}
+
+
+////////////////////////////////////////////////////////////
+bool setDeviceToNull()
+{
+    return priv::AudioDevice::setDeviceToNull();
+}
+
+
+////////////////////////////////////////////////////////////
 std::optional<std::string> getDevice()
 {
     return priv::AudioDevice::getDevice();
+}
+
+
+////////////////////////////////////////////////////////////
+std::optional<std::uint32_t> getDeviceSampleRate()
+{
+    return priv::AudioDevice::getDeviceSampleRate();
+}
+
+
+////////////////////////////////////////////////////////////
+bool isDefaultDevice()
+{
+    return priv::AudioDevice::isDefaultDevice();
+}
+
+
+////////////////////////////////////////////////////////////
+void setNotificationCallback(NotificationCallback callback)
+{
+    priv::AudioDevice::setNotificationCallback(std::move(callback));
 }
 
 } // namespace sf::PlaybackDevice

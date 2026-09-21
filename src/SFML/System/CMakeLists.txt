@@ -21,16 +21,18 @@ set(SRC
     ${INCROOT}/String.inl
     ${INCROOT}/Time.hpp
     ${INCROOT}/Time.inl
+    ${SRCROOT}/TimeoutWithPredicate.cpp
+    ${INCROOT}/TimeoutWithPredicate.hpp
     ${INCROOT}/Utf.hpp
     ${INCROOT}/Utf.inl
     ${SRCROOT}/Utils.hpp
     ${SRCROOT}/Utils.cpp
-    ${SRCROOT}/Vector2.cpp
     ${INCROOT}/Vector2.hpp
     ${INCROOT}/Vector2.inl
-    ${SRCROOT}/Vector3.cpp
     ${INCROOT}/Vector3.hpp
     ${INCROOT}/Vector3.inl
+    ${SRCROOT}/Version.cpp
+    ${INCROOT}/Version.hpp
     ${SRCROOT}/FileInputStream.cpp
     ${INCROOT}/FileInputStream.hpp
     ${SRCROOT}/MemoryInputStream.cpp
@@ -72,6 +74,9 @@ find_package(Threads REQUIRED)
 sfml_add_library(System
                  SOURCES ${SRC} ${PLATFORM_SRC}
                  DEPENDENCIES "Dependencies.cmake.in")
+
+# cpp-unicodelib sources
+target_include_directories(sfml-system SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/cpp-unicodelib")
 
 # enable precompiled headers
 if (SFML_ENABLE_PCH)

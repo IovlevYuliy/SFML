@@ -73,13 +73,8 @@ if(SFML_USE_SYSTEM_DEPS)
     find_package(FLAC REQUIRED)
 else()
     # use an immediately invoked function to scope option variables we have to set
-    function(sfml_add_audio_dependencies)
+    block()
         include(FetchContent)
-
-        # remember whether we are building SFML as a shared library
-        if(BUILD_SHARED_LIBS)
-            set(SFML_BUILD_SHARED_LIBS ON)
-        endif()
 
         set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
         set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
@@ -100,7 +95,7 @@ else()
 
         FetchContent_Declare(ogg
             GIT_REPOSITORY https://github.com/xiph/ogg.git
-            GIT_TAG v1.3.5
+            GIT_TAG v1.3.6
             GIT_SHALLOW ON
             # patch out parts we don't want of the Ogg CMake configuration
             # - installing headers & pkgconfig files
@@ -108,7 +103,7 @@ else()
             PATCH_COMMAND ${CMAKE_COMMAND} -DOGG_DIR=${FETCHCONTENT_BASE_DIR}/ogg-src -P ${PROJECT_SOURCE_DIR}/tools/ogg/PatchOgg.cmake)
         FetchContent_Declare(flac
             GIT_REPOSITORY https://github.com/xiph/flac.git
-            GIT_TAG 1.4.3
+            GIT_TAG 1.5.0
             GIT_SHALLOW ON
             # patch out parts we don't want of the FLAC CMake configuration:
             # - adding unnecessary libraries that aren't even used
@@ -128,14 +123,34 @@ else()
 
         set_target_properties(ogg FLAC vorbis vorbisenc vorbisfile PROPERTIES FOLDER "Dependencies")
 
-        # if building SFML as a shared library and linking our dependencies in
-        # as static libraries we need to build them with -fPIC
-        if(SFML_BUILD_SHARED_LIBS)
-            set_target_properties(ogg FLAC vorbis vorbisenc vorbisfile PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        endif()
-
-        # disable building dependencies as part of a unity build, they don't support it
-        set_target_properties(ogg FLAC vorbis vorbisenc vorbisfile PROPERTIES UNITY_BUILD OFF)
+        # build using unity build and exclude files that cause issues
+        set_target_properties(ogg FLAC vorbis vorbisenc vorbisfile PROPERTIES UNITY_BUILD ON UNITY_BUILD_BATCH_SIZE 256)
+        set_source_files_properties(
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/fixed.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/format.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/fixed_intrin_sse2.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/fixed_intrin_ssse3.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/fixed_intrin_sse42.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/lpc.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/metadata_object.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/stream_decoder.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/stream_encoder.c"
+            "${FETCHCONTENT_BASE_DIR}/flac-src/src/libFLAC/window.c"
+            TARGET_DIRECTORY FLAC
+            PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+        )
+        set_source_files_properties(
+            "${FETCHCONTENT_BASE_DIR}/vorbis-src/lib/floor1.c"
+            "${FETCHCONTENT_BASE_DIR}/vorbis-src/lib/sharedbook.c"
+            "${FETCHCONTENT_BASE_DIR}/vorbis-src/lib/vorbisenc.c"
+            TARGET_DIRECTORY vorbis
+            PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+        )
+        set_source_files_properties(
+            "${FETCHCONTENT_BASE_DIR}/vorbis-src/lib/vorbisenc.c"
+            TARGET_DIRECTORY vorbisenc
+            PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+        )
 
         sfml_set_stdlib(ogg)
         sfml_set_stdlib(FLAC)
@@ -151,12 +166,24 @@ else()
             target_compile_definitions(FLAC PRIVATE _FILE_OFFSET_BITS=32)
         endif()
 
+        # Disable all warnings
+        target_compile_options(ogg PRIVATE -w)
+        target_compile_options(FLAC PRIVATE -w)
+        target_compile_options(vorbis PRIVATE -w)
+        target_compile_options(vorbisenc PRIVATE -w)
+        target_compile_options(vorbisfile PRIVATE -w)
+
         # aliases were introduced only after 1.3.7 was released
         add_library(Vorbis::vorbis ALIAS vorbis)
         add_library(Vorbis::vorbisenc ALIAS vorbisenc)
         add_library(Vorbis::vorbisfile ALIAS vorbisfile)
-    endfunction()
-    sfml_add_audio_dependencies()
+    endblock()
+
+    # if building SFML as a shared library or on android (where exes are shared libs) and linking our dependencies in
+    # as static libraries we need to build them with -fPIC
+    if(BUILD_SHARED_LIBS OR SFML_OS_ANDROID)
+        set_target_properties(ogg FLAC vorbis vorbisenc vorbisfile PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    endif()
 endif()
 
 find_package(Threads REQUIRED)
@@ -189,8 +216,8 @@ endif()
 # miniaudio sources
 target_include_directories(sfml-audio SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/miniaudio")
 
-# minimp3 sources
-target_include_directories(sfml-audio SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/minimp3")
+# dr_mp3 sources
+target_include_directories(sfml-audio SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/dr_mp3")
 
 if(SFML_OS_ANDROID)
     target_link_libraries(sfml-audio PRIVATE android OpenSLES)

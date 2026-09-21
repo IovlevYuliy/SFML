@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -510,13 +510,17 @@ void WglContext::updateSettingsFromPixelFormat()
     {
         m_isGeneric = true;
 
-        err() << "Warning: Detected \"Microsoft Corporation GDI Generic\" OpenGL implementation" << std::endl;
+        [[maybe_unused]] static const bool hasWarnedAboutGeneric = [actualFormat]() -> bool
+        {
+            err() << "Warning: Detected \"Microsoft Corporation GDI Generic\" OpenGL implementation" << std::endl;
 
-        // Detect if the generic GDI implementation is not accelerated
-        if (!(actualFormat.dwFlags & PFD_GENERIC_ACCELERATED))
-            err() << "Warning: The \"Microsoft Corporation GDI Generic\" OpenGL implementation is not "
-                     "hardware-accelerated"
-                  << std::endl;
+            // Detect if the generic GDI implementation is not accelerated
+            if (!(actualFormat.dwFlags & PFD_GENERIC_ACCELERATED))
+                err() << "Warning: The \"Microsoft Corporation GDI Generic\" OpenGL implementation is not "
+                         "hardware-accelerated"
+                      << std::endl;
+            return true;
+        }();
     }
 
     if (SF_GLAD_WGL_ARB_pixel_format)

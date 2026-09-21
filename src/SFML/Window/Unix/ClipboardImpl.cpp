@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -175,13 +175,13 @@ void ClipboardImpl::processEventsImpl()
 
     // Pick out the events that are interesting for this window
     while (XCheckIfEvent(m_display.get(), &event, &checkEvent, reinterpret_cast<XPointer>(m_window)))
-        m_events.push_back(event);
+        m_events.push(event);
 
     // Handle the events for this window that we just picked out
     while (!m_events.empty())
     {
         event = m_events.front();
-        m_events.pop_front();
+        m_events.pop();
         processEvent(event);
     }
 }

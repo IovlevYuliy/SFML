@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Marco Antognini (antognini.marco@gmail.com),
+// Copyright (C) 2007-2026 Marco Antognini (antognini.marco@gmail.com),
 //                         Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
@@ -116,11 +116,10 @@ WindowImplCocoa::WindowImplCocoa(WindowHandle handle)
     }
     else
     {
-
-        sf::err() << "Cannot import this Window Handle because it is neither "
-                  << "a <NSWindow*> nor <NSView*> object "
-                  << "(or any of their subclasses). You gave a <" << [[nsHandle className] UTF8String] << "> object."
-                  << std::endl;
+        err() << "Cannot import this Window Handle because it is neither "
+              << "a <NSWindow*> nor <NSView*> object "
+              << "(or any of their subclasses). You gave a <" << [[nsHandle className] UTF8String] << "> object."
+              << std::endl;
         return;
     }
 

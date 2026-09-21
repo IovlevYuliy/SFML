@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -108,7 +108,22 @@ std::optional<SoundFileReader::Info> SoundFileReaderOgg::open(InputStream& strea
 
     // Retrieve the music attributes
     vorbis_info* vorbisInfo = ov_info(&m_vorbis, -1);
-    Info         info;
+
+    // When attempting to retrieve the total PCM sample count using ov_pcm_total() below,
+    // make sure to set the read position back to the beginning of the file after calling ov_info().
+    // Depending on how big the header and embedded comment data is, not seeking back
+    // to the beginning of the file can lead to a wrong PCM sample count being returned.
+    // See:
+    // https://web.archive.org/web/20250924022223/https://stackoverflow.com/questions/8653670/vorbis-finding-decompressed-size-of-file/72482773#72482773
+    // https://github.com/xiph/vorbis/issues/60
+    // https://github.com/xiph/vorbis/pull/71
+    if (ov_raw_seek(&m_vorbis, 0) < 0)
+    {
+        err() << "Failed to seek to start of Vorbis file" << std::endl;
+        return std::nullopt;
+    }
+
+    Info info;
     info.channelCount = static_cast<unsigned int>(vorbisInfo->channels);
     info.sampleRate   = static_cast<unsigned int>(vorbisInfo->rate);
     info.sampleCount  = static_cast<std::size_t>(ov_pcm_total(&m_vorbis, -1) * vorbisInfo->channels);

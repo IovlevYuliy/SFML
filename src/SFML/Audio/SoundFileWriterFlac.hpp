@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -36,6 +36,7 @@
 #include <vector>
 
 #include <cstdint>
+#include <cstdio>
 
 
 namespace sf::priv
@@ -90,6 +91,7 @@ private:
     {
         void operator()(FLAC__StreamEncoder* encoder) const;
     };
+    std::FILE*                                                     m_file{};
     std::unique_ptr<FLAC__StreamEncoder, FlacStreamEncoderDeleter> m_encoder;        //!< FLAC stream encoder
     unsigned int                                                   m_channelCount{}; //!< Number of channels
     std::array<std::size_t, 8> m_remapTable{}; //!< Table we use to remap source to target channel order

@@ -10,6 +10,13 @@
 
 #include <cassert>
 
+// Allow testing deprecated functions
+#ifdef _MSC_VER
+#pragma warning(disable : 4996)
+#else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace
 {
 // Return either argument depending on whether wchar_t is 16 or 32 bits
@@ -61,10 +68,10 @@ TEST_CASE("[System] sf::U8StringCharTraits")
 {
     SECTION("Type traits")
     {
-        STATIC_CHECK(std::is_copy_constructible_v<sf::U8StringCharTraits>);
-        STATIC_CHECK(std::is_copy_assignable_v<sf::U8StringCharTraits>);
-        STATIC_CHECK(std::is_nothrow_move_constructible_v<sf::U8StringCharTraits>);
-        STATIC_CHECK(std::is_nothrow_move_assignable_v<sf::U8StringCharTraits>);
+        STATIC_CHECK(std::is_trivially_copy_constructible_v<sf::U8StringCharTraits>);
+        STATIC_CHECK(std::is_trivially_copy_assignable_v<sf::U8StringCharTraits>);
+        STATIC_CHECK(std::is_trivially_move_constructible_v<sf::U8StringCharTraits>);
+        STATIC_CHECK(std::is_trivially_move_assignable_v<sf::U8StringCharTraits>);
     }
 
     SECTION("assign(char_type&, const char_type&)")
@@ -197,6 +204,7 @@ TEST_CASE("[System] sf::U8StringCharTraits")
 TEST_CASE("[System] sf::String")
 {
     using namespace std::string_literals;
+    using namespace std::string_view_literals;
 
     SECTION("Type traits")
     {
@@ -242,7 +250,6 @@ TEST_CASE("[System] sf::String")
 
         SECTION("ANSI C string constructor")
         {
-            SECTION("Nullptr")
             {
                 const sf::String string = static_cast<char*>(nullptr);
                 CHECK(std::string(string).empty());
@@ -256,18 +263,16 @@ TEST_CASE("[System] sf::String")
                 CHECK(string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
-
-            SECTION("Non-empty string")
             {
-                const sf::String string = "def";
-                CHECK(std::string(string) == "def"s);
-                CHECK(std::wstring(string) == L"def"s);
-                CHECK(string.toAnsiString() == "def"s);
-                CHECK(string.toWideString() == L"def"s);
-                CHECK(string.toUtf8() == sf::U8String{'d', 'e', 'f'});
-                CHECK(string.toUtf16() == u"def"s);
-                CHECK(string.toUtf32() == U"def"s);
-                CHECK(string.getSize() == 3);
+                const sf::String string = "Escargot";
+                CHECK(std::string(string) == "Escargot"s);
+                CHECK(std::wstring(string) == L"Escargot"s);
+                CHECK(string.toAnsiString() == "Escargot"s);
+                CHECK(string.toWideString() == L"Escargot"s);
+                CHECK(string.toUtf8() == sf::U8String{'E', 's', 'c', 'a', 'r', 'g', 'o', 't'});
+                CHECK(string.toUtf16() == u"Escargot"s);
+                CHECK(string.toUtf32() == U"Escargot"s);
+                CHECK(string.getSize() == 8);
                 CHECK(!string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
@@ -275,37 +280,66 @@ TEST_CASE("[System] sf::String")
 
         SECTION("ANSI string constructor")
         {
-            const sf::String string = "ghi"s;
-            CHECK(std::string(string) == "ghi"s);
-            CHECK(std::wstring(string) == L"ghi"s);
-            CHECK(string.toAnsiString() == "ghi"s);
-            CHECK(string.toWideString() == L"ghi"s);
-            CHECK(string.toUtf8() == sf::U8String{'g', 'h', 'i'});
-            CHECK(string.toUtf16() == u"ghi"s);
-            CHECK(string.toUtf32() == U"ghi"s);
-            CHECK(string.getSize() == 3);
+            const sf::String string = "Csiga"s;
+            CHECK(std::string(string) == "Csiga"s);
+            CHECK(std::wstring(string) == L"Csiga"s);
+            CHECK(string.toAnsiString() == "Csiga"s);
+            CHECK(string.toWideString() == L"Csiga"s);
+            CHECK(string.toUtf8() == sf::U8String{'C', 's', 'i', 'g', 'a'});
+            CHECK(string.toUtf16() == u"Csiga"s);
+            CHECK(string.toUtf32() == U"Csiga"s);
+            CHECK(string.getSize() == 5);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
+
+        SECTION("ANSI string view constructor")
+        {
+            const sf::String string = "Csiga"sv;
+            CHECK(std::string(string) == "Csiga"s);
+            CHECK(std::wstring(string) == L"Csiga"s);
+            CHECK(string.toAnsiString() == "Csiga"s);
+            CHECK(string.toWideString() == L"Csiga"s);
+            CHECK(string.toUtf8() == sf::U8String{'C', 's', 'i', 'g', 'a'});
+            CHECK(string.toUtf16() == u"Csiga"s);
+            CHECK(string.toUtf32() == U"Csiga"s);
+            CHECK(string.getSize() == 5);
             CHECK(!string.isEmpty());
             CHECK(string.getData() != nullptr);
         }
 
         SECTION("Wide character constructor")
         {
-            const sf::String string = L'\xFA';
-            CHECK(std::string(string) == select("\xFA"s, "\0"s));
-            CHECK(std::wstring(string) == L"\xFA"s);
-            CHECK(string.toAnsiString() == select("\xFA"s, "\0"s));
-            CHECK(string.toWideString() == L"\xFA"s);
-            CHECK(string.toUtf8() == sf::U8String{0xC3, 0xBA});
-            CHECK(string.toUtf16() == u"\xFA"s);
-            CHECK(string.toUtf32() == U"\xFA"s);
-            CHECK(string.getSize() == 1);
-            CHECK(!string.isEmpty());
-            CHECK(string.getData() != nullptr);
+            {
+                const sf::String string = L'ú';
+                CHECK(std::string(string) == select("\xFA"s, ""s));
+                CHECK(std::wstring(string) == L"ú"s);
+                CHECK(string.toAnsiString() == select("\xFA"s, ""s));
+                CHECK(string.toWideString() == L"ú"s);
+                CHECK(string.toUtf8() == sf::U8String{0xC3, 0xBA});
+                CHECK(string.toUtf16() == u"ú"s);
+                CHECK(string.toUtf32() == U"ú"s);
+                CHECK(string.getSize() == 1);
+                CHECK(!string.isEmpty());
+                CHECK(string.getData() != nullptr);
+            }
+            {
+                const sf::String string = L'Ǻ';
+                CHECK(std::string(string).empty());
+                CHECK(std::wstring(string) == L"Ǻ"s);
+                CHECK(string.toAnsiString().empty());
+                CHECK(string.toWideString() == L"Ǻ"s);
+                CHECK(string.toUtf8() == sf::U8String{0xC7, 0xBA});
+                CHECK(string.toUtf16() == u"Ǻ"s);
+                CHECK(string.toUtf32() == U"Ǻ"s);
+                CHECK(string.getSize() == 1);
+                CHECK(!string.isEmpty());
+                CHECK(string.getData() != nullptr);
+            }
         }
 
         SECTION("Wide C string constructor")
         {
-            SECTION("Nullptr")
             {
                 const sf::String string = static_cast<wchar_t*>(nullptr);
                 CHECK(std::string(string).empty());
@@ -319,18 +353,17 @@ TEST_CASE("[System] sf::String")
                 CHECK(string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
-
-            SECTION("Non-empty string")
             {
-                const sf::String string = L"j\xFAl";
-                CHECK(std::string(string) == select("j\xFAl"s, "j\0l"s));
-                CHECK(std::wstring(string) == L"j\xFAl"s);
-                CHECK(string.toAnsiString() == select("j\xFAl"s, "j\0l"s));
-                CHECK(string.toWideString() == L"j\xFAl"s);
-                CHECK(string.toUtf8() == sf::U8String{'j', 0xC3, 0xBA, 'l'});
-                CHECK(string.toUtf16() == u"j\xFAl"s);
-                CHECK(string.toUtf32() == U"j\xFAl"s);
-                CHECK(string.getSize() == 3);
+                const sf::String string = L"Улитка";
+                CHECK(std::string(string).empty());
+                CHECK(std::wstring(string) == L"Улитка"s);
+                CHECK(string.toAnsiString().empty());
+                CHECK(string.toWideString() == L"Улитка"s);
+                CHECK(string.toUtf8() ==
+                      sf::U8String{0xD0, 0xA3, 0xD0, 0xBB, 0xD0, 0xB8, 0xD1, 0x82, 0xD0, 0xBA, 0xD0, 0xB0});
+                CHECK(string.toUtf16() == u"Улитка"s);
+                CHECK(string.toUtf32() == U"Улитка"s);
+                CHECK(string.getSize() == 6);
                 CHECK(!string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
@@ -338,29 +371,44 @@ TEST_CASE("[System] sf::String")
 
         SECTION("Wide string constructor")
         {
-            const sf::String string = L"mno\xFA"s;
-            CHECK(std::string(string) == select("mno\xFA"s, "mno\0"s));
-            CHECK(std::wstring(string) == L"mno\xFA"s);
-            CHECK(string.toAnsiString() == select("mno\xFA"s, "mno\0"s));
-            CHECK(string.toWideString() == L"mno\xFA"s);
-            CHECK(string.toUtf8() == sf::U8String{'m', 'n', 'o', 0xC3, 0XBA});
-            CHECK(string.toUtf16() == u"mno\xFA"s);
-            CHECK(string.toUtf32() == U"mno\xFA"s);
-            CHECK(string.getSize() == 4);
+            const sf::String string = L"Полжав"s;
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == L"Полжав"s);
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == L"Полжав"s);
+            CHECK(string.toUtf8() == sf::U8String{0xD0, 0x9F, 0xD0, 0xBE, 0xD0, 0xBB, 0xD0, 0xB6, 0xD0, 0xB0, 0xD0, 0xB2});
+            CHECK(string.toUtf16() == u"Полжав"s);
+            CHECK(string.toUtf32() == U"Полжав"s);
+            CHECK(string.getSize() == 6);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
+
+        SECTION("Wide string view constructor")
+        {
+            const sf::String string = L"Полжав"sv;
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == L"Полжав"s);
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == L"Полжав"s);
+            CHECK(string.toUtf8() == sf::U8String{0xD0, 0x9F, 0xD0, 0xBE, 0xD0, 0xBB, 0xD0, 0xB6, 0xD0, 0xB0, 0xD0, 0xB2});
+            CHECK(string.toUtf16() == u"Полжав"s);
+            CHECK(string.toUtf32() == U"Полжав"s);
+            CHECK(string.getSize() == 6);
             CHECK(!string.isEmpty());
             CHECK(string.getData() != nullptr);
         }
 
         SECTION("UTF-32 character constructor")
         {
-            const sf::String string = U'\U0010AFAF';
-            CHECK(std::string(string) == "\0"s);
-            CHECK(std::wstring(string) == select(L""s, L"\U0010AFAF"s));
-            CHECK(string.toAnsiString() == "\0"s);
-            CHECK(string.toWideString() == select(L""s, L"\U0010AFAF"s));
-            CHECK(string.toUtf8() == sf::U8String{0xF4, 0x8A, 0xBE, 0xAF});
-            CHECK(string.toUtf16() == u"\U0010AFAF"s);
-            CHECK(string.toUtf32() == U"\U0010AFAF"s);
+            const sf::String string = U'🐌';
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == select(L""s, L"🐌"s));
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == select(L""s, L"🐌"s));
+            CHECK(string.toUtf8() == sf::U8String{0xF0, 0x9F, 0x90, 0x8C});
+            CHECK(string.toUtf16() == u"🐌"s);
+            CHECK(string.toUtf32() == U"🐌"s);
             CHECK(string.getSize() == 1);
             CHECK(!string.isEmpty());
             CHECK(string.getData() != nullptr);
@@ -368,7 +416,6 @@ TEST_CASE("[System] sf::String")
 
         SECTION("UTF-32 C string constructor")
         {
-            SECTION("Nullptr")
             {
                 const sf::String string = static_cast<char32_t*>(nullptr);
                 CHECK(std::string(string).empty());
@@ -382,18 +429,30 @@ TEST_CASE("[System] sf::String")
                 CHECK(string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
-
-            SECTION("Non-empty string")
             {
-                const sf::String string = U"\U0010ABCDrs";
-                CHECK(std::string(string) == "\0rs"s);
-                CHECK(std::wstring(string) == select(L"rs"s, L"\U0010ABCDrs"s));
-                CHECK(string.toAnsiString() == "\0rs"s);
-                CHECK(string.toWideString() == select(L"rs"s, L"\U0010ABCDrs"s));
-                CHECK(string.toUtf8() == sf::U8String{0xF4, 0x8A, 0xAF, 0x8D, 'r', 's'});
-                CHECK(string.toUtf16() == u"\U0010ABCDrs"s);
-                CHECK(string.toUtf32() == U"\U0010ABCDrs"s);
-                CHECK(string.getSize() == 3);
+                const sf::String string = U"カタツムリ";
+                CHECK(std::string(string).empty());
+                CHECK(std::wstring(string) == L"カタツムリ"s);
+                CHECK(string.toAnsiString().empty());
+                CHECK(string.toWideString() == L"カタツムリ"s);
+                CHECK(string.toUtf8() ==
+                      sf::U8String{0xE3, 0x82, 0xAB, 0xE3, 0x82, 0xBF, 0xE3, 0x83, 0x84, 0xE3, 0x83, 0xA0, 0xE3, 0x83, 0xAA});
+                CHECK(string.toUtf16() == u"カタツムリ"s);
+                CHECK(string.toUtf32() == U"カタツムリ"s);
+                CHECK(string.getSize() == 5);
+                CHECK(!string.isEmpty());
+                CHECK(string.getData() != nullptr);
+            }
+            {
+                const sf::String string = U"🐌🐚";
+                CHECK(std::string(string).empty());
+                CHECK(std::wstring(string) == select(L""s, L"🐌🐚"s));
+                CHECK(string.toAnsiString().empty());
+                CHECK(string.toWideString() == select(L""s, L"🐌🐚"s));
+                CHECK(string.toUtf8() == sf::U8String{0xF0, 0x9F, 0x90, 0x8C, 0xF0, 0x9F, 0x90, 0x9A});
+                CHECK(string.toUtf16() == u"🐌🐚"s);
+                CHECK(string.toUtf32() == U"🐌🐚"s);
+                CHECK(string.getSize() == 2);
                 CHECK(!string.isEmpty());
                 CHECK(string.getData() != nullptr);
             }
@@ -401,15 +460,30 @@ TEST_CASE("[System] sf::String")
 
         SECTION("UTF-32 string constructor")
         {
-            const sf::String string = U"tuv\U00104321"s;
-            CHECK(std::string(string) == "tuv\0"s);
-            CHECK(std::wstring(string) == select(L"tuv"s, L"tuv\U00104321"s));
-            CHECK(string.toAnsiString() == "tuv\0"s);
-            CHECK(string.toWideString() == select(L"tuv"s, L"tuv\U00104321"s));
-            CHECK(string.toUtf8() == sf::U8String{'t', 'u', 'v', 0xF4, 0x84, 0x8C, 0xA1});
-            CHECK(string.toUtf16() == u"tuv\U00104321"s);
-            CHECK(string.toUtf32() == U"tuv\U00104321"s);
-            CHECK(string.getSize() == 4);
+            const sf::String string = U"گھونگا"s;
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == L"گھونگا"s);
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == L"گھونگا"s);
+            CHECK(string.toUtf8() == sf::U8String{0xDA, 0xAF, 0xDA, 0xBE, 0xD9, 0x88, 0xD9, 0x86, 0xDA, 0xAF, 0xD8, 0xA7});
+            CHECK(string.toUtf16() == u"گھونگا"s);
+            CHECK(string.toUtf32() == U"گھونگا"s);
+            CHECK(string.getSize() == 6);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
+
+        SECTION("UTF-32 string view constructor")
+        {
+            const sf::String string = U"گھونگا"sv;
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == L"گھونگا"s);
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == L"گھونگا"s);
+            CHECK(string.toUtf8() == sf::U8String{0xDA, 0xAF, 0xDA, 0xBE, 0xD9, 0x88, 0xD9, 0x86, 0xDA, 0xAF, 0xD8, 0xA7});
+            CHECK(string.toUtf16() == u"گھونگا"s);
+            CHECK(string.toUtf32() == U"گھونگا"s);
+            CHECK(string.getSize() == 6);
             CHECK(!string.isEmpty());
             CHECK(string.getData() != nullptr);
         }
@@ -417,7 +491,17 @@ TEST_CASE("[System] sf::String")
 
     SECTION("fromUtf8()")
     {
-        SECTION("Nominal")
+        {
+            constexpr std::array<std::uint8_t, 1> characters{251};
+            const sf::String                      string = sf::String::fromUtf8(characters.begin(), characters.end());
+            CHECK(string.isEmpty());
+        }
+        {
+            constexpr std::array<std::uint8_t, 1> characters{251};
+            const sf::String string = sf::String::fromUtf8(characters.begin(), characters.end(), '?');
+            CHECK(string.getSize() == 1);
+            CHECK(string[0] == '?');
+        }
         {
             constexpr std::array<std::uint8_t, 4> characters{'w', 'x', 'y', 'z'};
             const sf::String                      string = sf::String::fromUtf8(characters.begin(), characters.end());
@@ -432,45 +516,107 @@ TEST_CASE("[System] sf::String")
             CHECK(!string.isEmpty());
             CHECK(string.getData() != nullptr);
         }
-
-        SECTION("Insufficient input")
         {
-            constexpr std::array<std::uint8_t, 1> characters{251};
+            constexpr std::array<std::uint8_t, 4> characters{0xF0, 0x9F, 0x90, 0x8C};
             const sf::String                      string = sf::String::fromUtf8(characters.begin(), characters.end());
-            constexpr char32_t                    defaultReplacementCharacter = 0;
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == select(L""s, L"🐌"s));
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == select(L""s, L"🐌"s));
+            CHECK(string.toUtf8() == sf::U8String{0xF0, 0x9F, 0x90, 0x8C});
+            CHECK(string.toUtf16() == u"🐌"s);
+            CHECK(string.toUtf32() == U"🐌"s);
             CHECK(string.getSize() == 1);
-            CHECK(string[0] == defaultReplacementCharacter);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
         }
     }
 
     SECTION("fromUtf16()")
     {
-        constexpr std::array<char16_t, 4> characters{0xF1, 'x', 'y', 'z'};
-        const sf::String                  string = sf::String::fromUtf16(characters.begin(), characters.end());
-        CHECK(std::string(string) == select("\xF1xyz"s, "\0xyz"s));
-        CHECK(std::wstring(string) == L"\xF1xyz"s);
-        CHECK(string.toAnsiString() == select("\xF1xyz"s, "\0xyz"s));
-        CHECK(string.toWideString() == L"\xF1xyz"s);
-        CHECK(string.toUtf8() == sf::U8String{0xC3, 0xB1, 'x', 'y', 'z'});
-        CHECK(string.toUtf16() == u"\xF1xyz"s);
-        CHECK(string.toUtf32() == U"\xF1xyz"s);
-        CHECK(string.getSize() == 4);
-        CHECK(!string.isEmpty());
-        CHECK(string.getData() != nullptr);
+        {
+            constexpr std::array<char16_t, 1> characters{0xD800};
+            const sf::String                  string = sf::String::fromUtf16(characters.begin(), characters.end());
+            CHECK(string.isEmpty());
+        }
+        {
+            constexpr std::array<char16_t, 1> characters{0xD800};
+            const sf::String                  string = sf::String::fromUtf16(characters.begin(), characters.end(), '?');
+            CHECK(string.getSize() == 1);
+            CHECK(string[0] == '?');
+        }
+        {
+            constexpr std::array<char16_t, 2> characters{0xD800, 0xD800};
+            const sf::String                  string = sf::String::fromUtf16(characters.begin(), characters.end());
+            CHECK(string.isEmpty());
+        }
+        {
+            constexpr std::array<char16_t, 2> characters{0xD800, 0xD800};
+            const sf::String                  string = sf::String::fromUtf16(characters.begin(), characters.end(), '?');
+            CHECK(string.getSize() == 2);
+            CHECK(string[0] == '?');
+        }
+        {
+            constexpr std::u16string_view characters = u"SFML!"sv;
+            const sf::String              string     = sf::String::fromUtf16(characters.begin(), characters.end());
+            CHECK(std::string(string) == "SFML!"s);
+            CHECK(std::wstring(string) == L"SFML!"s);
+            CHECK(string.toAnsiString() == "SFML!"s);
+            CHECK(string.toWideString() == L"SFML!"s);
+            CHECK(string.toUtf8() == sf::U8String{'S', 'F', 'M', 'L', '!'});
+            CHECK(string.toUtf16() == u"SFML!"s);
+            CHECK(string.toUtf32() == U"SFML!"s);
+            CHECK(string.getSize() == 5);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
+        {
+            constexpr std::u16string_view characters = u"piñata"sv;
+            const sf::String              string     = sf::String::fromUtf16(characters.begin(), characters.end());
+            CHECK(std::string(string) == select("pi\xF1"
+                                                "ata"s,
+                                                "piata"s));
+            CHECK(std::wstring(string) == L"piñata"s);
+            CHECK(string.toAnsiString() == select("pi\xF1"
+                                                  "ata"s,
+                                                  "piata"s));
+            CHECK(string.toWideString() == L"piñata"s);
+            CHECK(string.toUtf8() == sf::U8String{'p', 'i', 0xC3, 0xB1, 'a', 't', 'a'});
+            CHECK(string.toUtf16() == u"piñata"s);
+            CHECK(string.toUtf32() == U"piñata"s);
+            CHECK(string.getSize() == 6);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
+        {
+            constexpr std::u16string_view characters = u"달팽이"sv;
+            const sf::String              string     = sf::String::fromUtf16(characters.begin(), characters.end());
+            CHECK(std::string(string).empty());
+            CHECK(std::wstring(string) == L"달팽이"s);
+            CHECK(string.toAnsiString().empty());
+            CHECK(string.toWideString() == L"달팽이"s);
+            CHECK(string.toUtf8() == sf::U8String{0xEB, 0x8B, 0xAC, 0xED, 0x8C, 0xBD, 0xEC, 0x9D, 0xB4});
+            CHECK(string.toUtf16() == u"달팽이"s);
+            CHECK(string.toUtf32() == U"달팽이"s);
+            CHECK(string.getSize() == 3);
+            CHECK(!string.isEmpty());
+            CHECK(string.getData() != nullptr);
+        }
     }
 
     SECTION("fromUtf32()")
     {
-        constexpr std::array<char32_t, 4> characters{'w', 0x104321, 'y', 'z'};
-        const sf::String                  string = sf::String::fromUtf32(characters.begin(), characters.end());
-        CHECK(std::string(string) == "w\0yz"s);
-        CHECK(std::wstring(string) == select(L"wyz"s, L"w\U00104321yz"s));
-        CHECK(string.toAnsiString() == "w\0yz"s);
-        CHECK(string.toWideString() == select(L"wyz"s, L"w\U00104321yz"s));
-        CHECK(string.toUtf8() == sf::U8String{'w', 0xF4, 0x84, 0x8C, 0xA1, 'y', 'z'});
-        CHECK(string.toUtf16() == u"w\U00104321yz"s);
-        CHECK(string.toUtf32() == U"w\U00104321yz"s);
-        CHECK(string.getSize() == 4);
+        constexpr std::u32string_view characters = U"👍+👎=🤷"sv;
+        const sf::String              string     = sf::String::fromUtf32(characters.begin(), characters.end());
+        CHECK(std::string(string) == "+="s);
+        CHECK(std::wstring(string) == select(L"+="s, L"👍+👎=🤷"s));
+        CHECK(string.toAnsiString() == "+="s);
+        CHECK(string.toWideString() == select(L"+="s, L"👍+👎=🤷"s));
+        CHECK(string.toUtf8() ==
+              sf::U8String{0xF0, 0x9F, 0x91, 0x8D, '+', 0xF0, 0x9F, 0x91, 0x8E, '=', 0xF0, 0x9F, 0xA4, 0xB7});
+        CHECK(string.toUtf16() == u"👍+👎=🤷"s);
+        CHECK(string.toUtf32() == U"👍+👎=🤷"s);
+        CHECK(string.getSize() == 5);
         CHECK(!string.isEmpty());
         CHECK(string.getData() != nullptr);
     }
@@ -479,7 +625,7 @@ TEST_CASE("[System] sf::String")
     {
         sf::String string("you'll never guess what happens when you call clear()");
         string.clear();
-        CHECK(string == sf::String());
+        CHECK(string.isEmpty());
         CHECK(string.getSize() == 0);
     }
 

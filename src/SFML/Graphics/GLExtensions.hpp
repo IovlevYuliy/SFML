@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -172,6 +172,9 @@ inline int SF_GL_OES_vertex_buffer_object = 1;
 #define GLEXT_texture_sRGB    false
 #define GLEXT_GL_SRGB8_ALPHA8 0
 
+// Core since 3.0 - ARB_framebuffer_sRGB
+#define GLEXT_framebuffer_sRGB false
+
 // Core since 3.0 - EXT_blend_minmax
 #define GLEXT_blend_minmax SF_GLAD_GL_EXT_blend_minmax
 // glBlendEquation is provided by OES_blend_subtract, see above
@@ -313,6 +316,9 @@ inline int SF_GL_OES_vertex_buffer_object = 1;
 // Core since 2.1 - EXT_texture_sRGB
 #define GLEXT_texture_sRGB                         SF_GLAD_GL_EXT_texture_sRGB
 #define GLEXT_GL_SRGB8_ALPHA8                      GL_SRGB8_ALPHA8_EXT
+
+// Core since 3.0 - ARB_framebuffer_sRGB
+#define GLEXT_framebuffer_sRGB                     SF_GLAD_GL_ARB_framebuffer_sRGB
 
 // Core since 3.0 - EXT_framebuffer_object
 #define GLEXT_framebuffer_object                   SF_GLAD_GL_EXT_framebuffer_object

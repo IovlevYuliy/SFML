@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -47,8 +47,8 @@ namespace sf
 struct SoundStream::Impl : priv::MiniaudioUtils::SoundBase
 {
     explicit Impl(SoundStream* ownerPtr) :
-    SoundBase(vtable, [](void* ptr) { static_cast<Impl*>(ptr)->initialize(); }),
-    owner(ownerPtr)
+        SoundBase(vtable, [](void* ptr) { static_cast<Impl*>(ptr)->initialize(); }),
+        owner(ownerPtr)
     {
         // Initialize sound structure and set default settings
         initialize();
@@ -333,7 +333,7 @@ unsigned int SoundStream::getSampleRate() const
 
 
 ////////////////////////////////////////////////////////////
-std::vector<SoundChannel> SoundStream::getChannelMap() const
+const std::vector<SoundChannel>& SoundStream::getChannelMap() const
 {
     return m_impl->channelMap;
 }

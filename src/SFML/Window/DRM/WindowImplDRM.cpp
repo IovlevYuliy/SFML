@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2024-2025 Andrew Mickelson
+// Copyright (C) 2024-2026 Andrew Mickelson
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -75,7 +75,7 @@ WindowImplDRM::WindowImplDRM(VideoMode mode,
                              std::uint32_t /*style*/,
                              State /*state*/,
                              const ContextSettings& /*settings*/) :
-m_size(mode.size)
+    m_size(mode.size)
 {
     InputImpl::setTerminalConfig();
 }

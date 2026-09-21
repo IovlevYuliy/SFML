@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -29,6 +29,7 @@
 #include <SFML/System/Utf.hpp>
 
 #include <iterator>
+#include <unicodelib.h>
 #include <utility>
 
 #include <cassert>
@@ -173,7 +174,13 @@ String::String(const char* ansiString, const std::locale& locale)
 
 
 ////////////////////////////////////////////////////////////
-String::String(const std::string& ansiString, const std::locale& locale)
+String::String(const std::string& ansiString, const std::locale& locale) : String(std::string_view(ansiString), locale)
+{
+}
+
+
+////////////////////////////////////////////////////////////
+String::String(std::string_view ansiString, const std::locale& locale)
 {
     m_string.reserve(ansiString.length() + 1);
     Utf32::fromAnsi(ansiString.begin(), ansiString.end(), std::back_inserter(m_string), locale);
@@ -196,7 +203,13 @@ String::String(const wchar_t* wideString)
 
 
 ////////////////////////////////////////////////////////////
-String::String(const std::wstring& wideString)
+String::String(const std::wstring& wideString) : String(std::wstring_view(wideString))
+{
+}
+
+
+////////////////////////////////////////////////////////////
+String::String(std::wstring_view wideString)
 {
     m_string.reserve(wideString.length() + 1);
     Utf32::fromWide(wideString.begin(), wideString.end(), std::back_inserter(m_string));
@@ -216,6 +229,12 @@ String::String(std::u32string utf32String) : m_string(std::move(utf32String))
 
 
 ////////////////////////////////////////////////////////////
+String::String(std::u32string_view utf32String) : m_string(utf32String)
+{
+}
+
+
+////////////////////////////////////////////////////////////
 String::operator std::string() const
 {
     return toAnsiString();
@@ -230,56 +249,56 @@ String::operator std::wstring() const
 
 
 ////////////////////////////////////////////////////////////
-std::string String::toAnsiString(const std::locale& locale) const
+std::string String::toAnsiString(const std::locale& locale, std::optional<char> replacement) const
 {
     // Prepare the output string
     std::string output;
     output.reserve(m_string.length() + 1);
 
     // Convert
-    Utf32::toAnsi(m_string.begin(), m_string.end(), std::back_inserter(output), 0, locale);
+    Utf32::toAnsi(m_string.begin(), m_string.end(), std::back_inserter(output), replacement, locale);
 
     return output;
 }
 
 
 ////////////////////////////////////////////////////////////
-std::wstring String::toWideString() const
+std::wstring String::toWideString(std::optional<wchar_t> replacement) const
 {
     // Prepare the output string
     std::wstring output;
     output.reserve(m_string.length() + 1);
 
     // Convert
-    Utf32::toWide(m_string.begin(), m_string.end(), std::back_inserter(output), 0);
+    Utf32::toWide(m_string.begin(), m_string.end(), std::back_inserter(output), replacement);
 
     return output;
 }
 
 
 ////////////////////////////////////////////////////////////
-U8String String::toUtf8() const
+U8String String::toUtf8(std::optional<std::uint8_t> replacement) const
 {
     // Prepare the output string
     U8String output;
     output.reserve(m_string.length());
 
     // Convert
-    Utf32::toUtf8(m_string.begin(), m_string.end(), std::back_inserter(output));
+    Utf32::toUtf8(m_string.begin(), m_string.end(), std::back_inserter(output), replacement);
 
     return output;
 }
 
 
 ////////////////////////////////////////////////////////////
-std::u16string String::toUtf16() const
+std::u16string String::toUtf16(std::optional<std::uint16_t> replacement) const
 {
     // Prepare the output string
     std::u16string output;
     output.reserve(m_string.length());
 
     // Convert
-    Utf32::toUtf16(m_string.begin(), m_string.end(), std::back_inserter(output));
+    Utf32::toUtf16(m_string.begin(), m_string.end(), std::back_inserter(output), replacement);
 
     return output;
 }
@@ -420,6 +439,27 @@ String::Iterator String::end()
 String::ConstIterator String::end() const
 {
     return m_string.end();
+}
+
+
+////////////////////////////////////////////////////////////
+bool String::isGraphemeBoundary(std::size_t position) const
+{
+    return unicode::is_grapheme_boundary(m_string.data(), m_string.size(), position);
+}
+
+
+////////////////////////////////////////////////////////////
+bool String::isWordBoundary(std::size_t position) const
+{
+    return unicode::is_word_boundary(m_string.data(), m_string.size(), position);
+}
+
+
+////////////////////////////////////////////////////////////
+bool String::isSentenceBoundary(std::size_t position) const
+{
+    return unicode::is_sentence_boundary(m_string.data(), m_string.size(), position);
 }
 
 

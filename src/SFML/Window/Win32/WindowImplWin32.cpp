@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -168,9 +168,9 @@ WindowImplWin32::WindowImplWin32(VideoMode     mode,
                                  std::uint32_t style,
                                  State         state,
                                  const ContextSettings& /*settings*/) :
-m_lastSize(mode.size),
-m_fullscreen(state == State::Fullscreen),
-m_cursorGrabbed(m_fullscreen)
+    m_lastSize(mode.size),
+    m_fullscreen(state == State::Fullscreen),
+    m_cursorGrabbed(m_fullscreen)
 {
     // Set that this process is DPI aware and can handle DPI scaling
     setProcessDpiAware();
@@ -213,7 +213,7 @@ m_cursorGrabbed(m_fullscreen)
 
     // Create the window
     m_handle = CreateWindowW(className,
-                             title.toWideString().c_str(),
+                             reinterpret_cast<const wchar_t*>(title.toUtf16().c_str()),
                              win32Style,
                              left,
                              top,
@@ -358,7 +358,7 @@ void WindowImplWin32::setSize(Vector2u size)
 ////////////////////////////////////////////////////////////
 void WindowImplWin32::setTitle(const String& title)
 {
-    SetWindowTextW(m_handle, title.toWideString().c_str());
+    SetWindowTextW(m_handle, reinterpret_cast<const wchar_t*>(title.toUtf16().c_str()));
 }
 
 

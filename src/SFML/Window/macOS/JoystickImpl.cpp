@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Marco Antognini (antognini.marco@gmail.com),
+// Copyright (C) 2007-2026 Marco Antognini (antognini.marco@gmail.com),
 //                         Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
@@ -43,9 +43,8 @@ namespace
 // Convert a CFStringRef to std::string
 std::string stringFromCFString(CFStringRef cfString)
 {
-    const CFIndex     length = CFStringGetLength(cfString);
-    std::vector<char> str(static_cast<std::size_t>(length));
-    const CFIndex     maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
+    const CFIndex     maxSize = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString), kCFStringEncodingUTF8);
+    std::vector<char> str(static_cast<std::size_t>(maxSize) + 1, '\0');
     CFStringGetCString(cfString, str.data(), maxSize, kCFStringEncodingUTF8);
     return str.data();
 }
@@ -268,9 +267,9 @@ bool JoystickImpl::open(unsigned int index)
 
                             if (min != 0 || max != 7)
                             {
-                                sf::err() << std::hex << "Joystick (vendor/product id: 0x" << m_identification.vendorId
-                                          << "/0x" << m_identification.productId << std::dec
-                                          << ") range is an unexpected one: [" << min << ", " << max << "]" << std::endl;
+                                err() << std::hex << "Joystick (vendor/product id: 0x" << m_identification.vendorId
+                                      << "/0x" << m_identification.productId << std::dec
+                                      << ") range is an unexpected one: [" << min << ", " << max << "]" << std::endl;
                             }
                             else
                             {
@@ -285,16 +284,16 @@ bool JoystickImpl::open(unsigned int index)
                         // See §3.4.3 Usage Types (Collection) of HUT v1.12
                         if (IOHIDElementGetCollectionType(element) != kIOHIDElementCollectionTypeApplication)
                         {
-                            sf::err() << std::hex << "Gamepage (vendor/product id: 0x" << m_identification.vendorId
-                                      << "/0x" << m_identification.productId << ") is not an CA but a 0x"
-                                      << IOHIDElementGetCollectionType(element) << std::dec << std::endl;
+                            err() << std::hex << "Gamepage (vendor/product id: 0x" << m_identification.vendorId << "/0x"
+                                  << m_identification.productId << ") is not an CA but a 0x"
+                                  << IOHIDElementGetCollectionType(element) << std::dec << std::endl;
                         }
                         break;
 
                     default:
 #ifdef SFML_DEBUG
-                        sf::err() << "Unexpected usage for element of Page Generic Desktop: 0x" << std::hex
-                                  << IOHIDElementGetUsage(element) << std::dec << std::endl;
+                        err() << "Unexpected usage for element of Page Generic Desktop: 0x" << std::hex
+                              << IOHIDElementGetUsage(element) << std::dec << std::endl;
 #endif
                         break;
                 }

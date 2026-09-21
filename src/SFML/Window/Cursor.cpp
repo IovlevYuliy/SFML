@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -48,10 +48,10 @@ Cursor::Cursor() : m_impl(std::make_unique<priv::CursorImpl>())
 Cursor::Cursor(const std::uint8_t* pixels, Vector2u size, Vector2u hotspot) : Cursor()
 {
     if ((pixels == nullptr) || (size.x == 0) || (size.y == 0))
-        throw sf::Exception("Failed to create cursor from pixels (invalid arguments)");
+        throw Exception("Failed to create cursor from pixels (invalid arguments)");
 
     if (!m_impl->loadFromPixels(pixels, size, hotspot))
-        throw sf::Exception("Failed to create cursor from pixels");
+        throw Exception("Failed to create cursor from pixels");
 }
 
 
@@ -59,7 +59,7 @@ Cursor::Cursor(const std::uint8_t* pixels, Vector2u size, Vector2u hotspot) : Cu
 Cursor::Cursor(Type type) : Cursor()
 {
     if (!m_impl->loadFromSystem(type))
-        throw sf::Exception("Failed to create cursor from type");
+        throw Exception("Failed to create cursor from type");
 }
 
 

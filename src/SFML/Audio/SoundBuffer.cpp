@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -44,7 +44,7 @@ namespace sf
 SoundBuffer::SoundBuffer(const std::filesystem::path& filename)
 {
     if (!loadFromFile(filename))
-        throw sf::Exception("Failed to open sound buffer from file");
+        throw Exception("Failed to open sound buffer from file");
 }
 
 
@@ -52,7 +52,7 @@ SoundBuffer::SoundBuffer(const std::filesystem::path& filename)
 SoundBuffer::SoundBuffer(const void* data, std::size_t sizeInBytes)
 {
     if (!loadFromMemory(data, sizeInBytes))
-        throw sf::Exception("Failed to open sound buffer from memory");
+        throw Exception("Failed to open sound buffer from memory");
 }
 
 
@@ -60,7 +60,7 @@ SoundBuffer::SoundBuffer(const void* data, std::size_t sizeInBytes)
 SoundBuffer::SoundBuffer(InputStream& stream)
 {
     if (!loadFromStream(stream))
-        throw sf::Exception("Failed to open sound buffer from stream");
+        throw Exception("Failed to open sound buffer from stream");
 }
 
 
@@ -72,7 +72,7 @@ SoundBuffer::SoundBuffer(const std::int16_t*              samples,
                          const std::vector<SoundChannel>& channelMap)
 {
     if (!loadFromSamples(samples, sampleCount, channelCount, sampleRate, channelMap))
-        throw sf::Exception("Failed to open sound buffer from samples");
+        throw Exception("Failed to open sound buffer from samples");
 }
 
 
@@ -93,7 +93,7 @@ SoundBuffer::SoundBuffer(const SoundBuffer& copy)
 SoundBuffer::~SoundBuffer()
 {
     // To prevent the iterator from becoming invalid, move the entire buffer to another
-    // container. Otherwise calling resetBuffer would result in detachSound being
+    // container. Otherwise calling `detachBuffer` would result in `detachSound` being
     // called which removes the sound from the internal list.
     SoundList sounds;
     sounds.swap(m_sounds);
@@ -213,7 +213,7 @@ unsigned int SoundBuffer::getChannelCount() const
 
 
 ////////////////////////////////////////////////////////////
-std::vector<SoundChannel> SoundBuffer::getChannelMap() const
+const std::vector<SoundChannel>& SoundBuffer::getChannelMap() const
 {
     return m_channelMap;
 }

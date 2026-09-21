@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2026 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -71,7 +71,7 @@ void InputSoundFile::StreamDeleter::operator()(InputStream* ptr) const
 InputSoundFile::InputSoundFile(const std::filesystem::path& filename)
 {
     if (!openFromFile(filename))
-        throw sf::Exception("Failed to open input sound file");
+        throw Exception("Failed to open input sound file");
 }
 
 
@@ -79,7 +79,7 @@ InputSoundFile::InputSoundFile(const std::filesystem::path& filename)
 InputSoundFile::InputSoundFile(const void* data, std::size_t sizeInBytes)
 {
     if (!openFromMemory(data, sizeInBytes))
-        throw sf::Exception("Failed to open input sound file from memory");
+        throw Exception("Failed to open input sound file from memory");
 }
 
 
@@ -87,7 +87,7 @@ InputSoundFile::InputSoundFile(const void* data, std::size_t sizeInBytes)
 InputSoundFile::InputSoundFile(InputStream& stream)
 {
     if (!openFromStream(stream))
-        throw sf::Exception("Failed to open input sound file from stream");
+        throw Exception("Failed to open input sound file from stream");
 }
 
 
