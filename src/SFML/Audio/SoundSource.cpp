@@ -194,7 +194,6 @@ void SoundSource::setAttenuationModel(AttenuationModel model)
 
         ma_sound_set_attenuation_model(sound, attenuationModel);
     }
-
 }
 
 
